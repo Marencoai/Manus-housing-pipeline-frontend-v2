@@ -38,7 +38,7 @@ const Dashboard = ({ apiUrl }) => {
       const appData = await appResponse.json();
       
       // Fetch recent projects
-      const recentResponse = await fetch(`${apiUrl}/projects?limit=5`);
+      const recentResponse = await fetch(`${apiUrl}/projects/?limit=5`);
       const recentData = await recentResponse.json();
       
       if (projectData.success) setStats(projectData.data);
