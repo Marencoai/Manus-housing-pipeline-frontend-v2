@@ -30,6 +30,10 @@ function App() {
   
   // Use Railway backend URL with forced HTTPS
  const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app/api';
+  // Debug: Log the actual API URL being used
+console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL );
+console.log('Final apiUrl being used:', apiUrl);
+
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, component: Dashboard },
