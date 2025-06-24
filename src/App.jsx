@@ -29,7 +29,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Use Railway backend URL with forced HTTPS
-  const apiUrl = 'https://thriving-playfulness-production.up.railway.app/api';
+ const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app/api';
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, component: Dashboard },
