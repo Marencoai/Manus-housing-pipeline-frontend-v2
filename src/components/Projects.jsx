@@ -65,7 +65,7 @@ const Projects = ({ apiUrl }) => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/projects`);
+      const response = await fetch(`${apiUrl}/projects/`);
       const data = await response.json();
       
       if (data.success) {
@@ -99,7 +99,7 @@ const Projects = ({ apiUrl }) => {
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiUrl}/projects`, {
+      const response = await fetch(`${apiUrl}/projects/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
