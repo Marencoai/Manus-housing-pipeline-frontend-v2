@@ -29,7 +29,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Use environment variable or fallback to Railway backend URL with forced HTTPS
-  const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app/api';
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app';
   
   // Debug: Log the actual API URL being used
   console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
