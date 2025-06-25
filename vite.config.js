@@ -5,7 +5,6 @@ import path from 'path'
 
 // https://vite.dev/config/
 // Force fresh build - environment variable fix
-
 export default defineConfig({
   plugins: [react(),tailwindcss()],
   resolve: {

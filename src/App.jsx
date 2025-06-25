@@ -1,4 +1,3 @@
-// Force fresh build - HTTPS fix
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
@@ -29,12 +28,12 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Use Railway backend URL with forced HTTPS
- const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app/api';
+  // Use environment variable or fallback to Railway backend URL with forced HTTPS
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://thriving-playfulness-production.up.railway.app/api';
+  
   // Debug: Log the actual API URL being used
-console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL );
-console.log('Final apiUrl being used:', apiUrl);
-
+  console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
+  console.log('Final apiUrl being used:', apiUrl);
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, component: Dashboard },
@@ -47,6 +46,11 @@ console.log('Final apiUrl being used:', apiUrl);
   ];
 
   const ActiveComponent = navigation.find(nav => nav.id === activeTab)?.component || Dashboard;
+
+  // Navigation handler for dashboard components
+  const handleNavigate = (section) => {
+    setActiveTab(section);
+  };
 
   return (
     <Router>
@@ -124,7 +128,7 @@ console.log('Final apiUrl being used:', apiUrl);
           {/* Page content */}
           <main className="flex-1 py-8">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <ActiveComponent apiUrl={apiUrl} />
+              <ActiveComponent apiUrl={apiUrl} onNavigate={handleNavigate} />
             </div>
           </main>
         </div>

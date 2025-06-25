@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SharePointStatus from './SharePointStatus';
+import SharePointManager from './SharePointManager';
 import { 
   Building2, 
   Plus, 
@@ -65,7 +68,7 @@ const Projects = ({ apiUrl }) => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/projects/`);
+      const response = await fetch(`${apiUrl}/projects`);
       const data = await response.json();
       
       if (data.success) {
@@ -99,7 +102,7 @@ const Projects = ({ apiUrl }) => {
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiUrl}/projects/`, {
+      const response = await fetch(`${apiUrl}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,6 +136,18 @@ const Projects = ({ apiUrl }) => {
       }
     } catch (error) {
       console.error('Error creating project:', error);
+    }
+  };
+
+  const handleProjectUpdate = (updatedProject) => {
+    // Update the project in the projects list
+    setProjects(projects.map(project => 
+      project.id === updatedProject.id ? updatedProject : project
+    ));
+    
+    // Update the selected project if it's currently being viewed
+    if (selectedProject && selectedProject.id === updatedProject.id) {
+      setSelectedProject(updatedProject);
     }
   };
 
@@ -190,6 +205,16 @@ const Projects = ({ apiUrl }) => {
               {project.description}
             </p>
           )}
+
+          {/* SharePoint Status */}
+          <SharePointStatus 
+            project={project} 
+            compact={true}
+            onCreateSite={() => {
+              setSelectedProject(project);
+              setShowDetailsModal(true);
+            }}
+          />
 
           <div className="flex items-center justify-between pt-2">
             <div className="text-xs text-gray-500">
@@ -427,40 +452,68 @@ const Projects = ({ apiUrl }) => {
 
       {/* Project Details Modal */}
       <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedProject?.name}</DialogTitle>
           </DialogHeader>
           {selectedProject && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-brand-navy mb-3">Project Details</h3>
-                  <div className="space-y-2 text-sm">
-                    <div><strong>Location:</strong> {selectedProject.address}, {selectedProject.city}, {selectedProject.state}</div>
-                    <div><strong>Phase:</strong> <Badge className={getPhaseColor(selectedProject.phase)}>{selectedProject.phase}</Badge></div>
-                    <div><strong>Total Units:</strong> {selectedProject.total_units}</div>
-                    <div><strong>Affordable Units:</strong> {selectedProject.affordable_units}</div>
-                    <div><strong>Total Cost:</strong> {formatCurrency(selectedProject.total_cost)}</div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-brand-navy mb-3">Financial Summary</h3>
-                  <div className="space-y-2 text-sm">
-                    <div><strong>Funding Secured:</strong> {formatCurrency(selectedProject.funding_secured)}</div>
-                    <div><strong>Funding Gap:</strong> {formatCurrency(selectedProject.funding_gap)}</div>
-                    <div><strong>Progress:</strong> {selectedProject.total_cost > 0 ? Math.round((selectedProject.funding_secured / selectedProject.total_cost) * 100) : 0}%</div>
-                  </div>
-                </div>
-              </div>
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="details">Project Details</TabsTrigger>
+                <TabsTrigger value="sharepoint">SharePoint Integration</TabsTrigger>
+              </TabsList>
               
-              {selectedProject.description && (
-                <div>
-                  <h3 className="font-semibold text-brand-navy mb-3">Description</h3>
-                  <p className="text-sm text-gray-600">{selectedProject.description}</p>
+              <TabsContent value="details" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-brand-navy mb-3">Project Details</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Location:</strong> {selectedProject.address}, {selectedProject.city}, {selectedProject.state}</div>
+                      <div><strong>Phase:</strong> <Badge className={getPhaseColor(selectedProject.phase)}>{selectedProject.phase}</Badge></div>
+                      <div><strong>Total Units:</strong> {selectedProject.total_units}</div>
+                      <div><strong>Affordable Units:</strong> {selectedProject.affordable_units}</div>
+                      <div><strong>Total Cost:</strong> {formatCurrency(selectedProject.total_cost)}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-brand-navy mb-3">Financial Summary</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Funding Secured:</strong> {formatCurrency(selectedProject.funding_secured)}</div>
+                      <div><strong>Funding Gap:</strong> {formatCurrency(selectedProject.funding_gap)}</div>
+                      <div><strong>Progress:</strong> {selectedProject.total_cost > 0 ? Math.round((selectedProject.funding_secured / selectedProject.total_cost) * 100) : 0}%</div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+                
+                {selectedProject.description && (
+                  <div>
+                    <h3 className="font-semibold text-brand-navy mb-3">Description</h3>
+                    <p className="text-sm text-gray-600">{selectedProject.description}</p>
+                  </div>
+                )}
+
+                {/* SharePoint Status Overview */}
+                <div>
+                  <h3 className="font-semibold text-brand-navy mb-3">SharePoint Integration</h3>
+                  <SharePointStatus 
+                    project={selectedProject} 
+                    compact={false}
+                    onCreateSite={() => {
+                      // Switch to SharePoint tab when creating site
+                      const sharepointTab = document.querySelector('[value="sharepoint"]');
+                      if (sharepointTab) sharepointTab.click();
+                    }}
+                  />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="sharepoint" className="space-y-6">
+                <SharePointManager 
+                  project={selectedProject} 
+                  onProjectUpdate={handleProjectUpdate}
+                />
+              </TabsContent>
+            </Tabs>
           )}
         </DialogContent>
       </Dialog>

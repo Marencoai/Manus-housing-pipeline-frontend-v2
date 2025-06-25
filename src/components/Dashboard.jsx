@@ -15,7 +15,7 @@ import {
   Calendar
 } from 'lucide-react';
 
-const Dashboard = ({ apiUrl }) => {
+const Dashboard = ({ apiUrl, onNavigate }) => {
   const [stats, setStats] = useState(null);
   const [applicationStats, setApplicationStats] = useState(null);
   const [recentProjects, setRecentProjects] = useState([]);
@@ -90,6 +90,13 @@ const Dashboard = ({ apiUrl }) => {
     }
   };
 
+  // Handle navigation to different sections
+  const handleNavigate = (section) => {
+    if (onNavigate) {
+      onNavigate(section);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -110,20 +117,26 @@ const Dashboard = ({ apiUrl }) => {
         </p>
       </div>
 
-      {/* Key Metrics */}
+      {/* Key Metrics - Now Clickable */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-l-brand-red">
+        <Card 
+          className="border-l-4 border-l-brand-red cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          onClick={() => handleNavigate('projects')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Total Projects</CardTitle>
             <Building2 className="h-5 w-5 text-brand-red" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-brand-navy">{stats?.total_projects || 0}</div>
-            <p className="text-xs text-gray-600 mt-1">Active developments</p>
+            <p className="text-xs text-gray-600 mt-1">Click to view all projects</p>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-brand-teal">
+        <Card 
+          className="border-l-4 border-l-brand-teal cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          onClick={() => handleNavigate('funding')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Funding Secured</CardTitle>
             <DollarSign className="h-5 w-5 text-brand-teal" />
@@ -132,11 +145,14 @@ const Dashboard = ({ apiUrl }) => {
             <div className="text-3xl font-bold text-brand-navy">
               {formatCurrency(stats?.financial_summary?.total_funding_secured)}
             </div>
-            <p className="text-xs text-gray-600 mt-1">Across all projects</p>
+            <p className="text-xs text-gray-600 mt-1">Click to view funding sources</p>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500">
+        <Card 
+          className="border-l-4 border-l-blue-500 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          onClick={() => handleNavigate('applications')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Applications</CardTitle>
             <FileText className="h-5 w-5 text-blue-500" />
@@ -146,7 +162,7 @@ const Dashboard = ({ apiUrl }) => {
               {applicationStats?.total_applications || 0}
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              {applicationStats?.success_rate || 0}% success rate
+              {applicationStats?.success_rate || 0}% success rate - Click to view
             </p>
           </CardContent>
         </Card>
@@ -231,19 +247,33 @@ const Dashboard = ({ apiUrl }) => {
         </Card>
       </div>
 
-      {/* Recent Projects */}
+      {/* Recent Projects - Now Clickable */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-brand-navy" />
-            Recent Projects
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-brand-navy" />
+              Recent Projects
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleNavigate('projects')}
+              className="border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-white"
+            >
+              View All Projects
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {recentProjects.length > 0 ? (
             <div className="space-y-4">
               {recentProjects.map((project) => (
-                <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div 
+                  key={project.id} 
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => handleNavigate('projects')}
+                >
                   <div className="flex-1">
                     <h3 className="font-semibold text-brand-navy">{project.name}</h3>
                     <p className="text-sm text-gray-600">
@@ -274,27 +304,45 @@ const Dashboard = ({ apiUrl }) => {
             <div className="text-center py-8 text-gray-500">
               <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p>No projects found. Create your first project to get started.</p>
+              <Button 
+                className="mt-4 bg-brand-red hover:bg-red-700 text-white"
+                onClick={() => handleNavigate('projects')}
+              >
+                <Building2 className="mr-2 h-4 w-4" />
+                Create First Project
+              </Button>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Now Functional */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button className="bg-brand-red hover:bg-red-700 text-white">
+            <Button 
+              className="bg-brand-red hover:bg-red-700 text-white"
+              onClick={() => handleNavigate('projects')}
+            >
               <Building2 className="mr-2 h-4 w-4" />
               New Project
             </Button>
-            <Button variant="outline" className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white">
+            <Button 
+              variant="outline" 
+              className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white"
+              onClick={() => handleNavigate('applications')}
+            >
               <FileText className="mr-2 h-4 w-4" />
               New Application
             </Button>
-            <Button variant="outline" className="border-brand-blue-gray text-brand-blue-gray hover:bg-brand-blue-gray hover:text-white">
+            <Button 
+              variant="outline" 
+              className="border-brand-blue-gray text-brand-blue-gray hover:bg-brand-blue-gray hover:text-white"
+              onClick={() => handleNavigate('time')}
+            >
               <Clock className="mr-2 h-4 w-4" />
               Track Time
             </Button>
